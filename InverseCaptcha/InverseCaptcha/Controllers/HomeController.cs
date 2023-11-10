@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using InverseCaptcha.Models;
 
@@ -18,9 +20,15 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Privacy()
+    private Questions _questions = new();
+    
+    public IActionResult Captcha()
     {
-        return View();
+        var session = HttpContext.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
+        HttpContext.Response.Cookies.Append("session",session);
+        var sessionQuestions = _questions.GetSessionQuestions(session);
+        
+        return View(sessionQuestions);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -28,4 +36,35 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+}
+
+internal class Questions
+{
+    private ConcurrentDictionary<string, SessionQuestions> _dict = new();
+    public SessionQuestions GetSessionQuestions(string session)
+    {
+        return _dict.GetOrAdd(session, GenerateQuestions);
+    }
+
+    private SessionQuestions GenerateQuestions(string sessionKey)
+    {
+        var questions = new SessionQuestions();
+        // david do your magic here
+        return questions;
+    }
+}
+
+public class SessionQuestions
+{
+    public List<Question> Questions { get; set; } = new();
+
+    public Question GetCurrentQuestion()
+    {
+        return null;
+    }
+}
+
+public class Question
+{
+    //todo: replace with impl in core
 }
