@@ -30,6 +30,34 @@ public class HomeController : Controller
         
         return View(sessionQuestions);
     }
+    
+    public IActionResult Answer(CaptchaAnswer input)
+    {
+        var session = HttpContext.Request.Cookies["session"];
+        if (session == null)
+        {
+            return Redirect("Boom");
+        }
+        var sessionQuestions = _questions.GetSessionQuestions(session);
+        if(sessionQuestions.HasCurrentQuestion == false)
+        {
+            return Redirect("Boom");
+        }
+        
+        var currentQuestion = sessionQuestions.GetCurrentQuestion();
+        if (currentQuestion == null)
+        { 
+            return Redirect("Boom");
+        }
+
+        var result = currentQuestion.TryAnswer(input.Answer);
+        if(result == CaptchaResult.Correct)
+        {
+            return Redirect("Captcha");
+        }
+
+        return StatusCode((int) HttpStatusCode.BadRequest);
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
@@ -57,14 +85,31 @@ internal class Questions
 public class SessionQuestions
 {
     public List<Question> Questions { get; set; } = new();
+    public bool HasCurrentQuestion { get; set; }
+    
+    public AnswerResult TryAnswer(string answer)
+    {
+        return AnswerResult.Done;
+    }
 
     public Question GetCurrentQuestion()
     {
-        return null;
+        return Questions.FirstOrDefault(x=>x.IsCurrent);
     }
+}
+
+public enum AnswerResult
+{
+    Unknown,
+    Done,
+    NeedMoreCaptcha,
+    Boom
 }
 
 public class Question
 {
-    //todo: replace with impl in core
+    public bool IsCurrent { get; set; }
+    
+    
+    
 }
