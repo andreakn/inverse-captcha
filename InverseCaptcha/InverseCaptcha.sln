@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InverseCaptcha", "InverseCaptcha\InverseCaptcha.csproj", "{EAC6FD7C-8FFF-45F8-A46E-2874020C4165}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InverseCaptcha.Core", "InverseCaptcha.Core\InverseCaptcha.Core.csproj", "{F8DCAA00-9A18-486C-A7B2-6567E88F0619}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAC6FD7C-8FFF-45F8-A46E-2874020C4165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC6FD7C-8FFF-45F8-A46E-2874020C4165}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC6FD7C-8FFF-45F8-A46E-2874020C4165}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC6FD7C-8FFF-45F8-A46E-2874020C4165}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8DCAA00-9A18-486C-A7B2-6567E88F0619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8DCAA00-9A18-486C-A7B2-6567E88F0619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8DCAA00-9A18-486C-A7B2-6567E88F0619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8DCAA00-9A18-486C-A7B2-6567E88F0619}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
