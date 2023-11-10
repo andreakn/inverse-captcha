@@ -14,15 +14,29 @@ public class HomeController : Controller
     public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
+        _questions = new Questions();
     }
 
     public IActionResult Index()
     {
         return View();
     }
+    [HttpGet("Utopia")]
+    public IActionResult Utopia()
+    {
+        var session = HttpContext.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
+        var sessionQuestions = _questions.GetSessionQuestions(session);
+        if (sessionQuestions.AllDone)
+        {
+            return View();
+        }
 
-    private Questions _questions = new();
+        return Redirect("Boom");
+    }
+
+    private Questions _questions {get; set;} 
     
+    [HttpGet("Captcha")]
     public IActionResult Captcha()
     {
         var session = HttpContext.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
@@ -32,8 +46,10 @@ public class HomeController : Controller
         return View(sessionQuestions);
     }
     
+    [HttpPost("Answer")]
     public IActionResult Answer(CaptchaAnswer input)
     {
+        input.Answer ??= "";
         var session = HttpContext.Request.Cookies["session"];
         if (session == null)
         {
@@ -54,28 +70,28 @@ public class HomeController : Controller
         var result = currentQuestion.TryAnswer(input.Answer);
         return result switch
         {
-            AnswerResult.Done => Redirect("Cleared"),
+            AnswerResult.Done => sessionQuestions.AllDone ? Redirect("Utopia") : Redirect("Captcha"),
             AnswerResult.Boom => Redirect("Boom"),
-            AnswerResult.NeedMoreCaptcha => Redirect("Captcha"),
             _ => StatusCode((int) HttpStatusCode.BadRequest)
         };
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    [HttpGet("Boom")]
+    public IActionResult Boom()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        HttpContext.Response.Cookies.Delete("session");
+        return View();
     }
 }
 
 public class CaptchaAnswer
 {
-    public string Answer { get; set; }
+    public string? Answer { get; set; }
 }
 
 internal class Questions
 {
-    private ConcurrentDictionary<string, SessionQuestions> _dict = new();
+    private static ConcurrentDictionary<string, SessionQuestions> _dict = new();
     public SessionQuestions GetSessionQuestions(string session)
     {
         return _dict.GetOrAdd(session, GenerateQuestions);
@@ -84,7 +100,6 @@ internal class Questions
     private SessionQuestions GenerateQuestions(string sessionKey)
     {
         var questions = new SessionQuestions();
-        // david do your magic here
         return questions;
     }
 }
@@ -92,8 +107,9 @@ internal class Questions
 public class SessionQuestions
 {
     public List<Question?> Questions { get; set; } = new();
-    public bool HasCurrentQuestion { get; set; }
-    
+    public bool HasCurrentQuestion => Questions.Any(q => q?.IsCurrent == true);
+    public bool AllDone => Questions.All(q => q?.HasBeenCleared == true);
+
     public AnswerResult TryAnswer(string answer)
     {
         return AnswerResult.Done;
@@ -102,6 +118,25 @@ public class SessionQuestions
     public Question? GetCurrentQuestion()
     {
         return Questions.FirstOrDefault(x=>x.IsCurrent);
+    }
+
+    public SessionQuestions()
+    {
+        Questions.Add(new PlusQuestion());
+        Questions.Add(new MultiplyQuestion());
+        PickNewQuestion();
+    }
+
+    private void PickNewQuestion()
+    {
+        Questions.ForEach(q=>q.IsCurrent = false);
+        var candidates = Questions.Where(q => !q.HasBeenCleared).ToList();
+        if (candidates.Any())
+        {
+            var rand = new Random();
+            var index = rand.Next(candidates.Count);
+            Questions[index]!.IsCurrent = true;
+        }
     }
 }
 

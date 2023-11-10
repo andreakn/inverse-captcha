@@ -4,5 +4,14 @@
     ViewBag.Title = "title";
     Layout = "_Layout";
 }
-
-<h2>@Model.GetCurrentQuestion()</h2>
+@{ var q = Model.GetCurrentQuestion();}
+<h2>@q.QuestionText</h2>
+<form method="post" action="Answer">
+    <div class="form-group">
+        <label class="control-label"></label>
+        <input name="Answer" class="form-control" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Submit" class="btn btn-primary" />
+    </div>
+</form>
