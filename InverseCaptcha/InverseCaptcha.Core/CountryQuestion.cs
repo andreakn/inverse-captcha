@@ -45,7 +45,11 @@ public class CountryQuestion : Question
     {
         var continentForCountry = _continents.Single(f => f.Code == country.Continent);
         var otherInContinent = new AnswerCategory("Other countries in continent", continentForCountry.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code)).Select(c => c.Name).ToArray());
-        return new List<AnswerCategory> { otherInContinent };
+        return new List<AnswerCategory>
+        {
+            otherInContinent, 
+            new ("Garbage", new string[0], new []{"\\w+"}),
+        };
     }
 }
 
