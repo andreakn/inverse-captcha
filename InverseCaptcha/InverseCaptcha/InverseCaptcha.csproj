@@ -7,6 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Content Remove="countries-readable.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="countries-readable.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.2.0" />
     </ItemGroup>
 

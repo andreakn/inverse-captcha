@@ -126,6 +126,7 @@ public class SessionQuestions
     {
         Questions.Add(new PlusQuestion());
         Questions.Add(new MultiplyQuestion());
+        Questions.Add(new CountryQuestion());
         PickNewQuestion();
     }
 
