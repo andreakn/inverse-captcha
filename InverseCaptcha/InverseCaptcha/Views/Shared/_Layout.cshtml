@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using InverseCaptcha.Controllers
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -12,7 +13,16 @@
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">InverseCaptcha</a>
+            
+            @{
+                var session = Context.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
+                var sessionQuestions = HomeController.TheQuestions.GetSessionQuestions(session);
+                var doneQuestions = sessionQuestions.Questions.Where(x=>x.HasBeenCleared).ToList();
+            }
+            
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                @doneQuestions.Count / @sessionQuestions.Questions.Count done
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

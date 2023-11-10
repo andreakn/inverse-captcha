@@ -14,7 +14,7 @@ public class HomeController : Controller
     public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
-        _questions = new Questions();
+        
     }
 
     public IActionResult Index()
@@ -25,23 +25,24 @@ public class HomeController : Controller
     public IActionResult Utopia()
     {
         var session = HttpContext.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
-        var sessionQuestions = _questions.GetSessionQuestions(session);
+        var sessionQuestions = TheQuestions.GetSessionQuestions(session);
         if (sessionQuestions.AllDone)
         {
+            HttpContext.Response.Cookies.Delete("session");
             return View();
         }
 
         return Redirect("Boom");
     }
 
-    private Questions _questions {get; set;} 
+    public static Questions TheQuestions {get; set;} = new();
     
     [HttpGet("Captcha")]
     public IActionResult Captcha()
     {
         var session = HttpContext.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
         HttpContext.Response.Cookies.Append("session",session);
-        var sessionQuestions = _questions.GetSessionQuestions(session);
+        var sessionQuestions = TheQuestions.GetSessionQuestions(session);
         
         return View(sessionQuestions);
     }
@@ -55,7 +56,7 @@ public class HomeController : Controller
         {
             return Redirect("Boom");
         }
-        var sessionQuestions = _questions.GetSessionQuestions(session);
+        var sessionQuestions = TheQuestions.GetSessionQuestions(session);
         if(sessionQuestions.HasCurrentQuestion == false)
         {
             return Redirect("Boom");
@@ -68,6 +69,7 @@ public class HomeController : Controller
         }
 
         var result = currentQuestion.TryAnswer(input.Answer);
+        sessionQuestions.PickNewQuestion();
         return result switch
         {
             AnswerResult.Done => sessionQuestions.AllDone ? Redirect("Utopia") : Redirect("Captcha"),
@@ -89,7 +91,7 @@ public class CaptchaAnswer
     public string? Answer { get; set; }
 }
 
-internal class Questions
+public class Questions
 {
     private static ConcurrentDictionary<string, SessionQuestions> _dict = new();
     public SessionQuestions GetSessionQuestions(string session)
@@ -127,7 +129,7 @@ public class SessionQuestions
         PickNewQuestion();
     }
 
-    private void PickNewQuestion()
+    public void PickNewQuestion()
     {
         Questions.ForEach(q=>q.IsCurrent = false);
         var candidates = Questions.Where(q => !q.HasBeenCleared).ToList();

@@ -9,7 +9,7 @@ public class PlusQuestion:Question
         var y = rand.Next(100);
         
         QuestionText = $"{x} + {y} = ?";
-        RequiredCategoriesToPass = 1;
+        RequiredCategoriesToPass = 2;
         HumanAnswers = new List<string> { (x + y).ToString() };
         AnswerCategories = new List<AnswerCategory>
         {
@@ -28,7 +28,7 @@ public class MultiplyQuestion:Question
         var y = rand.Next(10);
         
         QuestionText = $"{x} * {y} = ?";
-        RequiredCategoriesToPass = 1;
+        RequiredCategoriesToPass = 2;
         HumanAnswers = new List<string> { (x * y).ToString() };
         AnswerCategories = new List<AnswerCategory>
         {
