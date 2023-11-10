@@ -23,6 +23,7 @@ public class Question
 
     public bool HasBeenCleared => AnswerCategories.Count(a => a.HasBeenAnswered) >= RequiredCategoriesToPass;
     public bool IsCurrent { get; set; }
+    public int ClearedCategoriesCount => AnswerCategories.Count(x => x.HasBeenAnswered);
 
     public bool Answer(string answer)
     {

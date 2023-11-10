@@ -17,11 +17,12 @@
             @{
                 var session = Context.Request.Cookies["session"] ?? Guid.NewGuid().ToString();
                 var sessionQuestions = HomeController.TheQuestions.GetSessionQuestions(session);
-                var doneQuestions = sessionQuestions.Questions.Where(x=>x.HasBeenCleared).ToList();
+                var doneQuestions = sessionQuestions.Questions.Sum(x=>x.ClearedCategoriesCount);
+                
             }
             
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                @doneQuestions.Count / @sessionQuestions.Questions.Count done
+                @doneQuestions / @sessionQuestions.Questions.Sum(x=>x.RequiredCategoriesToPass) done
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
