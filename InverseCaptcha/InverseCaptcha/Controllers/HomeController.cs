@@ -102,14 +102,6 @@ public enum AnswerResult
 {
     Unknown,
     Done,
-    NeedMoreCaptcha,
     Boom
 }
 
-public class Question
-{
-    public bool IsCurrent { get; set; }
-    
-    
-    
-}
