@@ -17,30 +17,22 @@ public class Question
 
     public bool HasBeenCleared => AnswerCategories.Count(a => a.HasBeenAnswered) >= RequiredCategoriesToPass;
 
-    public bool HasBeenSkippedByPlayer { get; private set; }
-
     public bool Answer(string answer)
     {
         return AnswerCategories.Any(category => category.Answer(answer));
-    }
-
-    public void Skip()
-    {
-        if (!HasBeenCleared)
-        {
-            HasBeenSkippedByPlayer = true;
-        }
     }
 }
 
 public class AnswerCategory
 {
-    public string[] Answers { get; private set; }
+    public string Description { get; }
+    public string[] Answers { get; }
     public bool HasBeenAnswered { get; private set; }
 
-    public AnswerCategory(string[] answers)
+    public AnswerCategory(string description, string[] answers)
     {
         Answers = answers;
+        Description = description;
         HasBeenAnswered = false;
     }
 
