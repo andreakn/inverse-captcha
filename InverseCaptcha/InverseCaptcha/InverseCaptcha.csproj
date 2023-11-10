@@ -10,4 +10,8 @@
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\InverseCaptcha.Core\InverseCaptcha.Core.csproj" />
+    </ItemGroup>
+
 </Project>

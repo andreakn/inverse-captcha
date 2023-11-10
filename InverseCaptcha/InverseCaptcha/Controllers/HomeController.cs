@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
+using InverseCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
 using InverseCaptcha.Models;
 
@@ -51,12 +52,13 @@ public class HomeController : Controller
         }
 
         var result = currentQuestion.TryAnswer(input.Answer);
-        if(result == CaptchaResult.Correct)
+        return result switch
         {
-            return Redirect("Captcha");
-        }
-
-        return StatusCode((int) HttpStatusCode.BadRequest);
+            AnswerResult.Done => Redirect("Cleared"),
+            AnswerResult.Boom => Redirect("Boom"),
+            AnswerResult.NeedMoreCaptcha => Redirect("Captcha"),
+            _ => StatusCode((int) HttpStatusCode.BadRequest)
+        };
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -64,6 +66,11 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+}
+
+public class CaptchaAnswer
+{
+    public string Answer { get; set; }
 }
 
 internal class Questions
@@ -84,7 +91,7 @@ internal class Questions
 
 public class SessionQuestions
 {
-    public List<Question> Questions { get; set; } = new();
+    public List<Question?> Questions { get; set; } = new();
     public bool HasCurrentQuestion { get; set; }
     
     public AnswerResult TryAnswer(string answer)
@@ -92,16 +99,11 @@ public class SessionQuestions
         return AnswerResult.Done;
     }
 
-    public Question GetCurrentQuestion()
+    public Question? GetCurrentQuestion()
     {
         return Questions.FirstOrDefault(x=>x.IsCurrent);
     }
 }
 
-public enum AnswerResult
-{
-    Unknown,
-    Done,
-    Boom
-}
+
 

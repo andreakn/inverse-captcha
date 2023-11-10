@@ -16,13 +16,25 @@ public class Question
     public int RequiredCategoriesToPass { get; }
 
     public bool HasBeenCleared => AnswerCategories.Count(a => a.HasBeenAnswered) >= RequiredCategoriesToPass;
+    public bool IsCurrent { get; set; }
 
     public bool Answer(string answer)
     {
         return AnswerCategories.Any(category => category.Answer(answer));
     }
-}
 
+    public AnswerResult TryAnswer(string inputAnswer)
+    {
+        return AnswerResult.Done;
+    }
+}
+public enum AnswerResult
+{
+    Unknown,
+    Done,
+    Boom,
+    NeedMoreCaptcha
+}
 public class AnswerCategory
 {
     public string Description { get; }
