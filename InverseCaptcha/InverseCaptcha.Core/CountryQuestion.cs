@@ -15,9 +15,7 @@ public class CountryQuestion : Question
     {
         _countries = ReadCountries();
         _continents = CreateContinents();
-
         Regen();
-
     }
 
     private void Regen()
@@ -35,7 +33,7 @@ public class CountryQuestion : Question
     }
 
 
-    private List<Country> ReadCountries()
+    private static List<Country> ReadCountries()
     {
         using var fileStream = File.OpenRead("countries-readable.json");
         using var streamReader = new StreamReader(fileStream);
