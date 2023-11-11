@@ -133,8 +133,7 @@ public class SessionQuestions
         var candidates = Questions.Where(q => !q.HasBeenCleared).ToList();
         if (candidates.Any())
         {
-            var rand = new Random();
-            var index = rand.Next(candidates.Count);
+            var index = Random.Shared.Next(candidates.Count);
             Questions[index]!.IsCurrent = true;
         }
     }

@@ -2,8 +2,8 @@
 
 public class ColorQuestion: Question
 {
-    string[] rainbow = new[] { "red", "orange", "yellow", "green", "blue", "indigo", "violet" };
-    string[] colors = new[] { "Purple", "Black", "White", "Pink", "Gray", "Brown", "Cyan", "Magenta" };
+    private readonly string[] _rainbow = new[] { "red", "orange", "yellow", "green", "blue", "indigo", "violet" };
+    private readonly string[] _colors = new[] { "Purple", "Black", "White", "Pink", "Gray", "Brown", "Cyan", "Magenta" };
 
     public ColorQuestion()
     {
@@ -17,17 +17,16 @@ public class ColorQuestion: Question
 
     private void Regen()
     {
-        var rand = new Random();
-        var rainbowColor = rainbow[rand.Next(rainbow.Length)];
+        var rainbowColor = _rainbow[Random.Shared.Next(_rainbow.Length)];
         QuestionText = $"What is a color in the rainbow next to the color {rainbowColor}";
-        var previousColor = rainbow[(Array.IndexOf(rainbow, rainbowColor) - 1 + rainbow.Length) % rainbow.Length];
-        var nextColor = rainbow[(Array.IndexOf(rainbow, rainbowColor) + 1) % rainbow.Length];
+        var previousColor = _rainbow[(Array.IndexOf(_rainbow, rainbowColor) - 1 + _rainbow.Length) % _rainbow.Length];
+        var nextColor = _rainbow[(Array.IndexOf(_rainbow, rainbowColor) + 1) % _rainbow.Length];
         
         HumanAnswers = new List<string> { previousColor, nextColor };
         AnswerCategories = new List<AnswerCategory>
         {
-            new("OtherColors", colors, null),
-            new("RainbowColors", rainbow, null),
+            new("OtherColors", _colors, null),
+            new("RainbowColors", _rainbow, null),
             new("Hex", new[]{""},new[]{"\\d{6}","#\\d{6}"})
         };
     }
