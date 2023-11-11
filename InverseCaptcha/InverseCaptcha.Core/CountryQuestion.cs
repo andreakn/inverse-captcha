@@ -6,8 +6,10 @@ public class CountryQuestion : Question
 {
     private readonly List<Country> _countries;
     private readonly List<Continent> _continents;
-    private AnswerCategory? otherInContinent = null;
-    private AnswerCategory? otherInOtherContinents;
+    private AnswerCategory? _otherInContinent;
+    private AnswerCategory? _otherInOtherContinents;
+    private AnswerCategory? _countriesInOtherContinents;
+    private AnswerCategory? _nameOfContinents;
 
     public CountryQuestion() : base()
     {
@@ -20,8 +22,7 @@ public class CountryQuestion : Question
 
     private void Regen()
     {
-        var random = new Random();
-        var chosenCountry = _countries[random.Next(_countries.Count)];
+        var chosenCountry = _countries[Random.Shared.Next(_countries.Count)];
         QuestionText = $"Name a neighbouring country to {chosenCountry.Name}";
         AnswerCategories = GenerateAnswerCategories(chosenCountry);
         HumanAnswers = _countries.Where(c => chosenCountry.NeighbourCodes.Contains(c.Code)).Select(c => c.Name).ToList();
@@ -59,26 +60,27 @@ public class CountryQuestion : Question
     private List<AnswerCategory> GenerateAnswerCategories(Country country)
     {
         var continentForCountry = _continents.Single(f => f.Code == country.Continent);
-        otherInContinent ??= new AnswerCategory("Other countries in continent", Array.Empty<string>());
-        otherInContinent.Answers = continentForCountry.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code))
-            .Select(c => c.Name).ToArray();
+        _otherInContinent ??= new AnswerCategory("Other countries in continent", Array.Empty<string>());
+        _otherInContinent.Answers = continentForCountry.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code)).Select(c => c.Name).ToArray();
         
-        otherInOtherContinents ??= new AnswerCategory("Other countries in other continents", Array.Empty<string>());
-        otherInContinent.Answers = _continents.Where(x=>x.Code != country.Continent).SelectMany(x=>x.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code)))
+        _otherInOtherContinents ??= new AnswerCategory("Other countries in other continents", Array.Empty<string>());
+        _otherInContinent.Answers = _continents.Where(x=>x.Code != country.Continent).SelectMany(x=>x.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code)))
             .Select(c => c.Name).ToArray();
-        var otherInContinent = new AnswerCategory("Other countries in continent", continentForCountry.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code)).Select(c => c.Name).ToArray());
-        var countriesInOtherContinents = new AnswerCategory("Countries In Other Continents", _continents.Where(c => c.Code != country.Continent).SelectMany(c => c.Countries.Select(n => n.Name)).ToArray());
-        var nameOfContinents = new AnswerCategory("Name of continents", _continents.Select(c => c.Name).ToArray());
+
+        _countriesInOtherContinents ??= new AnswerCategory("Countries In Other Continents", Array.Empty<string>());
+        _countriesInOtherContinents.Answers = _continents.Where(c => c.Code != country.Continent).SelectMany(c => c.Countries.Select(n => n.Name)).ToArray();
+
+        _nameOfContinents ??= new AnswerCategory("Name of continents", Array.Empty<string>());
+        _nameOfContinents.Answers = _continents.Select(c => c.Name).ToArray();
+
         return new List<AnswerCategory>
         {
-            otherInContinent, 
-            otherInOtherContinents, 
+            _otherInContinent, 
+            _otherInOtherContinents,
+            _countriesInOtherContinents,
+            _nameOfContinents,
             new ("Garbage", new string[0], new []{"\\w+"}),
             new ("Blank", new string[0], new []{""}),
-            otherInContinent,
-            countriesInOtherContinents,
-            nameOfContinents,
-            new ("Garbage", Array.Empty<string>(), new []{"\\w+"}),
         };
     }
 }
