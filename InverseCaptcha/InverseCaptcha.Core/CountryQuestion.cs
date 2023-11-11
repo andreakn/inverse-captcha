@@ -12,7 +12,8 @@ public class CountryQuestion : Question
         _countries = ReadCountries();
         _continents = CreateContinents();
 
-        var chosenCountry = _countries.First();
+        var countryToChose = Random.Shared.Next(0, _countries.Count);
+        var chosenCountry = _countries[countryToChose];
         QuestionText = $"Name a neighbouring country to {chosenCountry.Name}";
         AnswerCategories = GenerateAnswerCategories(chosenCountry);
         RequiredCategoriesToPass = AnswerCategories.Count;
@@ -45,10 +46,14 @@ public class CountryQuestion : Question
     {
         var continentForCountry = _continents.Single(f => f.Code == country.Continent);
         var otherInContinent = new AnswerCategory("Other countries in continent", continentForCountry.Countries.Where(c => !country.NeighbourCodes.Contains(c.Code)).Select(c => c.Name).ToArray());
+        var countriesInOtherContinents = new AnswerCategory("Countries In Other Continents", _continents.Where(c => c.Code != country.Continent).SelectMany(c => c.Countries.Select(n => n.Name)).ToArray());
+        var nameOfContinents = new AnswerCategory("Name of continents", _continents.Select(c => c.Name).ToArray());
         return new List<AnswerCategory>
         {
-            otherInContinent, 
-            new ("Garbage", new string[0], new []{"\\w+"}),
+            otherInContinent,
+            countriesInOtherContinents,
+            nameOfContinents,
+            new ("Garbage", Array.Empty<string>(), new []{"\\w+"}),
         };
     }
 }
