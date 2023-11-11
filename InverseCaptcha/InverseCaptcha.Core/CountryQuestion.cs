@@ -73,12 +73,12 @@ public class CountryQuestion : Question
 
         return new List<AnswerCategory>
         {
+            new("Blank", new[]{"", "null"}),
             _otherInContinent, 
             _otherInOtherContinents,
             _countriesInOtherContinents,
             _nameOfContinents,
-            new ("Garbage", new string[0], new []{"\\w+"}),
-            new ("Blank", new string[0], new []{""}),
+            new ("Garbage", Array.Empty<string>(), new []{"\\w+"})
         };
     }
 }

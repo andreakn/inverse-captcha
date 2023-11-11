@@ -124,6 +124,7 @@ public class SessionQuestions
         Questions.Add(new PlusQuestion());
         Questions.Add(new MultiplyQuestion());
         Questions.Add(new CountryQuestion());
+        Questions.Add(new ColorQuestion());
         PickNewQuestion();
     }
 
@@ -138,6 +139,3 @@ public class SessionQuestions
         }
     }
 }
-
-
-
