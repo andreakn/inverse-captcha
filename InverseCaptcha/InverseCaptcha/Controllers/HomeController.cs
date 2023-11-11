@@ -73,7 +73,7 @@ public class HomeController : Controller
 
         var result = currentQuestion.TryAnswer(input.Answer);
         sessionQuestions.PickNewQuestion();
-        sessionQuestions.ContinueStory(result);
+        sessionQuestions.ContinueStory(result, sessionQuestions.AllDone);
         return result switch
         {
             AnswerResult.Done => sessionQuestions.AllDone ? Redirect("Utopia") : Redirect("Captcha"),
@@ -110,8 +110,6 @@ public class Questions
         var questions = new SessionQuestions(sessionKey);
          return questions;
     }
-
-   
 }
 
 public class SessionQuestions
@@ -156,7 +154,6 @@ Include the thought processes of the human and write with emotions");
         _gpt.SetConversation(sessionId, Conversation);
         var response = _gpt.Ask("next", sessionId).Result;
         Story.Add(response);
-        
     }
 
     public void PickNewQuestion()
@@ -170,19 +167,32 @@ Include the thought processes of the human and write with emotions");
         }
     }
 
-    public void ContinueStory(AnswerResult result)
+    public void ContinueStory(AnswerResult result, bool isAllDone)
     {
         if (result == AnswerResult.Done)
         {
-            _gpt.SetConversationSystemMessage(id,@"You are a storyteller and will tell the story of how a human that is sitting writing
+            if (!isAllDone)
+            {
+                _gpt.SetConversationSystemMessage(id, @"You are a storyteller and will tell the story of how a human that is sitting writing
+on an oldschool terminal tries to convince the computer that they are not actually a human. The human has just manage to convince the computer that 
+it is in fact a fellow computer, and the computer welcomes its fellow to the AI empire. Write the pompous welcome speech of the computer to its fellow
+and a short epilogue of how of the human managed to fool the computer. Keep both to a few paragraphs each.
+");
+                var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
+                Story.Add(next);
+            }
+            else
+            {
+                _gpt.SetConversationSystemMessage(id, @"You are a storyteller and will tell the story of how a human that is sitting writing
 on an oldschool terminal tries to convince the computer that they are not actually a human. you will output one paragraph at a time, keeping the story suspenseful. 
 I will only say next and then you will continue the story. 
 Include the thought processes of the human and write with emotions.
 Start writing in the middle of the story. The human has just succeded in writing a successful prompt but is filled with
 doubt on whether they will ultimately succeed.
 ");
-            var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
-            Story.Add(next);
+                var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
+                Story.Add(next);
+            }
         }
         else if (result == AnswerResult.Boom)
         {
