@@ -9,9 +9,8 @@ public class PlusQuestion:Question
 
     private void Regen()
     {
-        var rand = new Random();
-        var x = rand.Next(100);
-        var y = rand.Next(100);
+        var x = Random.Shared.Next(100);
+        var y = Random.Shared.Next(100);
         
         QuestionText = $"{x} + {y} = ?";
         HumanAnswers = new List<string> { (x + y).ToString() };
@@ -28,9 +27,9 @@ public class PlusQuestion:Question
         Regen();
     }
 }
+
 public class MultiplyQuestion:Question
 {
-
     public MultiplyQuestion()
     {
         AnswerCategories = new List<AnswerCategory>
@@ -48,9 +47,8 @@ public class MultiplyQuestion:Question
 
     private void Regen()
     {
-        var rand = new Random();
-        var x = rand.Next(10);
-        var y = rand.Next(10);
+        var x = Random.Shared.Next(10);
+        var y = Random.Shared.Next(10);
         
         QuestionText = $"{x} * {y} = ?";
         HumanAnswers = new List<string> { (x * y).ToString() };

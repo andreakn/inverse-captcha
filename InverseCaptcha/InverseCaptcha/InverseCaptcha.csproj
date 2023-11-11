@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Remove="countries-readable.json" />
-    </ItemGroup>
-
-    <ItemGroup>
       <EmbeddedResource Include="countries-readable.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
