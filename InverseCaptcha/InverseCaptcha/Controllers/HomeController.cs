@@ -110,12 +110,9 @@ public class SessionQuestions
 {
     public List<Question?> Questions { get; set; } = new();
     public bool HasCurrentQuestion => Questions.Any(q => q?.IsCurrent == true);
-    public bool AllDone => Questions.All(q => q?.HasBeenCleared == true);
+    public bool AllDone => Questions.Sum(q => q?.ClearedCategoriesCount)>= RequiredAnswerCount;
+    public int RequiredAnswerCount { get; set; } = 5;
 
-    public AnswerResult TryAnswer(string answer)
-    {
-        return AnswerResult.Done;
-    }
 
     public Question? GetCurrentQuestion()
     {

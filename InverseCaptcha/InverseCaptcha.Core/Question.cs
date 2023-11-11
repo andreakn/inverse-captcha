@@ -4,14 +4,17 @@ namespace InverseCaptcha.Core;
 
 public class Question
 {
-    public Question(string questionText, List<string> humanAnswers, List<AnswerCategory> answerCategories, int requiredCategoriesToPass)
+    public Question(string questionText, List<string> humanAnswers, List<AnswerCategory> answerCategories)
     {
         QuestionText = questionText;
         AnswerCategories = answerCategories;
-        RequiredCategoriesToPass = requiredCategoriesToPass;
         HumanAnswers = humanAnswers;
     }
 
+    public virtual void RegenerateQuestion()
+    {
+           
+    }
 
     protected Question() { }
     public string QuestionText { get; protected set; }
@@ -19,9 +22,8 @@ public class Question
 
     public List<AnswerCategory> AnswerCategories { get; protected set;}
 
-    public int RequiredCategoriesToPass { get; protected set;}
 
-    public bool HasBeenCleared => AnswerCategories.Count(a => a.HasBeenAnswered) >= RequiredCategoriesToPass;
+    public bool HasBeenCleared => AnswerCategories.All(a => a.HasBeenAnswered) ;
     public bool IsCurrent { get; set; }
     public int ClearedCategoriesCount => AnswerCategories.Count(x => x.HasBeenAnswered);
 
@@ -39,6 +41,7 @@ public class Question
 
         if (AnswerCategories.Any(c => c.Answer(inputAnswer)))
         {
+            RegenerateQuestion();
             return AnswerResult.Done;            
         }
         return AnswerResult.Boom;
@@ -53,7 +56,7 @@ public enum AnswerResult
 public class AnswerCategory
 {
     public string Description { get; }
-    public string[] Answers { get; }
+    public string[] Answers { get; set; }
     
     public string[] Patterns { get; }
     public bool HasBeenAnswered { get; private set; }
