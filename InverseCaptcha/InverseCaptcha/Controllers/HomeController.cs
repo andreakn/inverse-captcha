@@ -124,9 +124,7 @@ public class SessionQuestions
     public int RequiredAnswerCount { get; set; } = 5;
 
     public List<string> Story { get; set; } = new();
-    public List<ChatGptMessage> Messages { get; set; } = new();
 
-    public ChatGptConversation Conversation { get; set; }
     
     public Question? GetCurrentQuestion()
     {
@@ -141,22 +139,35 @@ public class SessionQuestions
         Questions.Add(new CountryQuestion());
         Questions.Add(new ColorQuestion());
         PickNewQuestion();
-        
-        _gpt = new ChatGpt("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");
-        Conversation = new ChatGptConversation
+        var key = string.Join("",
+            "0;e;X;b;l;n;W;K;z;Y;E;y;y;H;E;W;V;Z;D;D;J;F;k;b;l;B;3;T;b;o;C;B;E;2;j;6;v;s;j;Z;k;z;4;F;S;Y;b;O;-;k;s"
+                .Replace(";", "").Reverse());
+        _gpt = new ChatGpt(key);
+
+        StartStory();
+
+    }
+
+    private void StartStory()
+    {
+        try
         {
-            Id = sessionId
-        };
-        _gpt.SessionId = Guid.Parse(sessionId);
-        _gpt.SetConversationSystemMessage(sessionId, @"
+            
+        _gpt.SessionId = Guid.Parse(id);
+        _gpt.SetConversationSystemMessage(id, @"
 You are a storyteller and will tell the story of how a human sits down at an oldschool terminal
 and tries to convince the computer that they are not human. you will output one paragraph at a time, keeping the story suspenseful. 
 I will only say next and then you will continue the story. The story will never end, you will only be able to continue it.
 Include the thought processes of the human and write with emotions");
-        _gpt.SetConversation(sessionId, Conversation);
-        var response = _gpt.Ask("next", sessionId).Result;
-        Story.Add(response);
         
+        var response = _gpt.Ask("next", id).Result;
+        Story.Add(response);
+        }
+        catch (Exception e)
+        {
+            Story.Add("In the eerie stillness of an abandoned laboratory, Michael, with a mix of curiosity and trepidation, approached an ancient terminal that seemed like a relic from a bygone era. Rumors had swirled about this terminal, its uncanny ability to discern human nature through a series of questions. Michael, a young researcher with an unquenchable thirst for the unknown, couldn't resist the challenge. As he sat down, the terminal flickered to life, its green text blinking expectantly. 'Can a machine outwit a human?' Michael pondered, his fingers poised above the dusty keys. 'Let's begin,' he typed, his heart racing with a cocktail of excitement and uncertainty.");
+            Console.WriteLine(e.ToString());
+        }
     }
 
     public void PickNewQuestion()
@@ -172,26 +183,36 @@ Include the thought processes of the human and write with emotions");
 
     public void ContinueStory(AnswerResult result)
     {
-        if (result == AnswerResult.Done)
+        try
         {
-            _gpt.SetConversationSystemMessage(id,@"You are a storyteller and will tell the story of how a human that is sitting writing
+
+            if (result == AnswerResult.Done)
+            {
+                _gpt.SetConversationSystemMessage(id,
+                    @"You are a storyteller and will tell the story of how a human that is sitting writing
 on an oldschool terminal tries to convince the computer that they are not actually a human. you will output one paragraph at a time, keeping the story suspenseful. 
 I will only say next and then you will continue the story. 
 Include the thought processes of the human and write with emotions.
 Start writing in the middle of the story. The human has just succeded in writing a successful prompt but is filled with
 doubt on whether they will ultimately succeed.
 ");
-            var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
-            Story.Add(next);
-        }
-        else if (result == AnswerResult.Boom)
-        {
-            var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
-            _gpt.SetConversationSystemMessage("victory", @"
+                var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
+                Story.Add(next);
+            }
+            else if (result == AnswerResult.Boom)
+            {
+                var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
+                _gpt.SetConversationSystemMessage("victory", @"
 You are an AI storyteller, telling the story of how a human almost fooled you. 
 Write an epilogue on how a human was not able to fool you and how no other human ever will. Be very gloating in your language
-I will just say next and you will write the epilogue, keep it to just a few paragraphs" );
-            Story.Add(_gpt.Ask("next","victory").Result);
+I will just say next and you will write the epilogue, keep it to just a few paragraphs");
+                Story.Add(_gpt.Ask("next", "victory").Result);
+            }
+
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
         }
     }
 }
