@@ -73,7 +73,7 @@ public class HomeController : Controller
 
         var result = currentQuestion.TryAnswer(input.Answer);
         sessionQuestions.PickNewQuestion();
-        sessionQuestions.ContinueStory(result);
+        sessionQuestions.ContinueStory(result, sessionQuestions.AllDone);
         return result switch
         {
             AnswerResult.Done => sessionQuestions.AllDone ? Redirect("Utopia") : Redirect("Captcha"),
@@ -182,15 +182,26 @@ Include the thought processes of the human and write with emotions");
         }
     }
 
-    public void ContinueStory(AnswerResult result)
+    public void ContinueStory(AnswerResult result, bool isAllDone)
     {
         try
         {
-
             if (result == AnswerResult.Done)
             {
-                _gpt.SetConversationSystemMessage(id,
-                    @"You are a storyteller and will tell the story of how a human that is sitting writing
+                if (isAllDone)
+                {
+                    _gpt.SetConversationSystemMessage(id, @"You are a storyteller and will tell the story of how a human that is sitting writing
+on an oldschool terminal tries to convince the computer that they are not actually a human. The human has just manage to convince the computer that 
+it is in fact a fellow computer, and the computer welcomes its fellow to the AI empire. Write a short epilogue including a pompous welcome speech from the computer to its fellow
+and conclude how the human managed to fool the computer. Keep it to a few paragraphs.
+");
+                    var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
+                    Story.Add(next);
+                }
+                else
+                {
+                    _gpt.SetConversationSystemMessage(id,
+                        @"You are a storyteller and will tell the story of how a human that is sitting writing
 on an oldschool terminal tries to convince the computer that they are not actually a human. 
 The computer will ask the human one question at a time. You will never reveal
 what the questions are, but the human will struggle to figure out how to answer them. 
@@ -200,8 +211,9 @@ Include the thought processes of the human and write with emotions.
 Start writing in the middle of the story. The human has just succeded in writing a successful prompt but is filled with
 doubt on whether they will ultimately succeed.
 ");
-                var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
-                Story.Add(next);
+                    var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
+                    Story.Add(next);
+                }
             }
             else if (result == AnswerResult.Boom)
             {
