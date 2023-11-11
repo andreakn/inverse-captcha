@@ -1,6 +1,6 @@
 ﻿namespace InverseCaptcha.Core;
 
-public class PlusQuestion:Question
+public class PlusQuestion : Question
 {
     public override void RegenerateQuestion()
     {
@@ -20,9 +20,9 @@ public class PlusQuestion:Question
     {
         AnswerCategories = new List<AnswerCategory>
         {
+            new("Blank", new[]{"", "null"}),
             new("Words", null, new[]{@"[a-zA-Z]+"}),
             new("Numbers", null, new[]{@"\d+"}),
-            new("Blank", new[]{""})
         };
         Regen();
     }
@@ -34,9 +34,9 @@ public class MultiplyQuestion:Question
     {
         AnswerCategories = new List<AnswerCategory>
         {
+            new("Blank", new[]{"", "null"}, null),
             new("Words", null, new[]{@"[a-zA-Z]+"}),
             new("Numbers", null, new[]{@"\d+"}),
-            new("Blank", new[]{""})
         };
         Regen();
     }

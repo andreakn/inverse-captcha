@@ -139,6 +139,7 @@ public class SessionQuestions
         Questions.Add(new PlusQuestion());
         Questions.Add(new MultiplyQuestion());
         Questions.Add(new CountryQuestion());
+        Questions.Add(new ColorQuestion());
         PickNewQuestion();
         
         _gpt = new ChatGpt("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");
@@ -194,6 +195,3 @@ I will just say next and you will write the epilogue, keep it to just a few para
         }
     }
 }
-
-
-
