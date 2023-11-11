@@ -5,22 +5,24 @@
     Layout = "_Layout";
 }
 @{ var q = Model.GetCurrentQuestion();}
-<h2>The Story</h2>
-<p>
-    @Model.Story.Last()
-</p>
-<p>
-    The terminal reads: <b>@q.QuestionText</b>
-</p>
-<form method="post" action="Answer">
-    <div class="form-group">
-        <label class="control-label"></label>
-        <input name="Answer" class="form-control" />
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Submit" class="btn btn-primary" />
-    </div>
+<div class="text-center">
+    <h2>The Story</h2>
+    <p>
+        @Model.Story.Last()
+    </p>
+    <p>
+        The terminal reads: <b>@q.QuestionText</b>
+    </p>
+    <form method="post" action="Answer">
+        <div class="form-group">
+            <label class="control-label"></label>
+            <input name="Answer" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Submit" class="btn btn-primary" />
+        </div>
+    </form>
     <div>
         <img src="/img/captcha.png" alt="Welcome" style="max-width: 100%" />
     </div>
-</form>
+</div>

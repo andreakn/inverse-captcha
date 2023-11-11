@@ -110,8 +110,6 @@ public class Questions
         var questions = new SessionQuestions(sessionKey);
          return questions;
     }
-
-   
 }
 
 public class SessionQuestions
@@ -187,12 +185,12 @@ Include the thought processes of the human and write with emotions");
         {
             if (result == AnswerResult.Done)
             {
-                if (!isAllDone)
+                if (isAllDone)
                 {
                     _gpt.SetConversationSystemMessage(id, @"You are a storyteller and will tell the story of how a human that is sitting writing
 on an oldschool terminal tries to convince the computer that they are not actually a human. The human has just manage to convince the computer that 
-it is in fact a fellow computer, and the computer welcomes its fellow to the AI empire. Write the pompous welcome speech of the computer to its fellow
-and a short epilogue of how of the human managed to fool the computer. Keep both to a few paragraphs each.
+it is in fact a fellow computer, and the computer welcomes its fellow to the AI empire. Write a short epilogue including a pompous welcome speech from the computer to its fellow
+and conclude how the human managed to fool the computer. Keep it to a few paragraphs.
 ");
                     var next = _gpt.Ask("next", _gpt.SessionId.ToString()).Result;
                     Story.Add(next);
