@@ -5,7 +5,13 @@
     Layout = "_Layout";
 }
 @{ var q = Model.GetCurrentQuestion();}
-<h2>@q.QuestionText</h2>
+<h2>The Story</h2>
+<p>
+    @Model.Story.Last()
+</p>
+<p>
+    The terminal reads: <b>@q.QuestionText</b>
+</p>
 <form method="post" action="Answer">
     <div class="form-group">
         <label class="control-label"></label>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
+using ChatGPT.Net;
 using InverseCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
 using InverseCaptcha.Models;
@@ -11,6 +12,7 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
 
+    private ChatGPT.Net.ChatGpt _chatGpt = new("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");
     public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
@@ -101,31 +103,45 @@ public class Questions
 
     private SessionQuestions GenerateQuestions(string sessionKey)
     {
-        var questions = new SessionQuestions();
-        return questions;
+        var questions = new SessionQuestions(sessionKey);
+         return questions;
     }
+
+   
 }
 
 public class SessionQuestions
 {
+    private readonly ChatGpt _gpt;
     public List<Question?> Questions { get; set; } = new();
     public bool HasCurrentQuestion => Questions.Any(q => q?.IsCurrent == true);
     public bool AllDone => Questions.Sum(q => q?.ClearedCategoriesCount)>= RequiredAnswerCount;
     public int RequiredAnswerCount { get; set; } = 5;
 
+    public List<string> Story { get; set; } = new();
 
     public Question? GetCurrentQuestion()
     {
         return Questions.FirstOrDefault(x=>x.IsCurrent);
     }
 
-    public SessionQuestions()
+    public SessionQuestions(string sessionId)
     {
         Questions.Add(new PlusQuestion());
         Questions.Add(new MultiplyQuestion());
         Questions.Add(new CountryQuestion());
         Questions.Add(new ColorQuestion());
         PickNewQuestion();
+        
+        _gpt = new ChatGpt("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");
+        
+        _gpt.SessionId = Guid.Parse(sessionId);
+        _gpt.SetConversationSystemMessage(sessionId, @"
+You are a storyteller and will tell the story of how a human sits down at an oldschool terminal
+and tries to convince the computer that they are not human. you will output one paragraph at a time, keeping the story suspenseful. 
+I will only say next and then you will continue the story. The story will never end, you will only be able to continue it.
+Include the thought processes of the human and write with emotions");
+        Story.Add(_gpt.Ask("next", sessionId).Result );
     }
 
     public void PickNewQuestion()
